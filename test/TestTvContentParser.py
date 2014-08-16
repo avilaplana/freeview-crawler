@@ -3,7 +3,6 @@
 
 import unittest
 import urllib2
-import sys
 from tvContentParser import parseToTVContent
 
 class TestTvChannelParser(unittest.TestCase):
@@ -14,7 +13,7 @@ class TestTvChannelParser(unittest.TestCase):
         tv_content_channel_html_loaded = urllib2.urlopen(tv_content_channel_url).read()
         tv_content_channel_documents = parseToTVContent("Channel 4", tv_content_channel_html_loaded)
         for document in tv_content_channel_documents:
-            print "Testing content parsing" + document
+            print "Testing content parsing" + str(document)
             self.assertTrue(document["channel"] is not "", "channel name does not exist")
             self.assertTrue(document["description"] is not "", "description does not exist")
             if "flags" in document:
