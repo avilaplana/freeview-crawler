@@ -1,19 +1,20 @@
 #!/usr/local/bin/python
 
+
 import unittest
 import urllib2
+import sys
 from tvContentParser import parseToTVContent
 
 class TestTvChannelParser(unittest.TestCase):
 
-    def setUp(self):
-        self.seq = range(10)
-
     def test_shuffle(self):
+
         tv_content_channel_url = 'http://tvlistings.theguardian.com/text-only/?c=bbc-3'
         tv_content_channel_html_loaded = urllib2.urlopen(tv_content_channel_url).read()
         tv_content_channel_documents = parseToTVContent("Channel 4", tv_content_channel_html_loaded)
         for document in tv_content_channel_documents:
+            print "Testing content parsing" + document
             self.assertTrue(document["channel"] is not "", "channel name does not exist")
             self.assertTrue(document["description"] is not "", "description does not exist")
             if "flags" in document:
