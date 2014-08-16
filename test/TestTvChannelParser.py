@@ -11,7 +11,7 @@ class TestTvChannelParser(unittest.TestCase):
         channels_html_loaded = urllib2.urlopen(tv_channels_url).read()
         list_channels = parseToTVChannels(channels_html_loaded)
         for channel in list_channels:
-            print "Testing channel parsing" + str(channel)
+            print "Testing channel parsing" + str(channel.channel_document)
             self.assertTrue(channel.channel_document["name"] is not "", "name in channel does not exist")
             self.assertTrue(channel.channel_document["language"] is not "", "language in channel does not exist")
             self.assertTrue("/?c=" in channel.query_parameter, "query parameter does not exist")
