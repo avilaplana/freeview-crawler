@@ -3,21 +3,18 @@
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
-def unix_time(dt):
-    epoch = datetime.utcfromtimestamp(0)
-    delta = dt - epoch
-    return int(delta.total_seconds()*1000)
-
 def parseDateTime(startTime):
     hour = int(startTime.split(':')[0])
     minute = int(startTime.split(':')[1])
     return datetime.now().replace(hour=int(hour), minute=int(minute), second=0, microsecond=0)
 
 
-def parseSerie(episode_title, serie_title, tv_content):
+def parseSerie(episode_title, serie_title, tv_content, description):
     tv_content['serie'] = {}
     tv_content['serie']['serieTitle'] = serie_title
 
+    if len(description) > 0:
+        tv_content['serie']['description'] = description[0].text
     if 'Series' in episode_title and 'Episode' in episode_title:
         split_episode = episode_title.split('.')
         season_number = split_episode[0]
@@ -36,9 +33,11 @@ def parseSerie(episode_title, serie_title, tv_content):
     else:
         tv_content['serie']['episodeTitle'] = episode_title
 
-def parseProgram(program_title, tv_content):
+def parseProgram(program_title, tv_content, description):
     tv_content['program'] = {}
     tv_content['program']['title'] = program_title
+    if len(description) > 0:
+        tv_content['program']['description'] = description[0].text
 
 def parseToTVContent(channel, data):
 
@@ -52,25 +51,23 @@ def parseToTVContent(channel, data):
 
         start_time = slot.findAll('span',{'class':'tvg_show_start'})
         start_date_time = parseDateTime(start_time[0].text)
-        tv_content['startTime']= unix_time(start_date_time)
+        tv_content['startTime']= start_date_time
         end_date_time = (datetime.now() + timedelta(days=1)).replace(hour=2, minute=0, second=0, microsecond=0)
-        tv_content['endTime'] = unix_time(end_date_time)
+        tv_content['endTime'] = end_date_time
 
         show_title =  slot.findAll('span',{'class':'tvg_show_title'})
         episode_title =  slot.findAll('div',{'class':'tvg_show_episode_title'})
 
+        description = slot.findAll('div',{'class':'tvg_show_description'})
         if len(episode_title) > 0:
-            parseSerie(episode_title[0].text, show_title[0].text, tv_content)
+            parseSerie(episode_title[0].text, show_title[0].text, tv_content, description)
         else:
-            parseProgram(show_title[0].text, tv_content)
+            parseProgram(show_title[0].text, tv_content, description)
 
         flags =  slot.findAll('span',{'class':'tvg_show_flags'})
         if len(flags) > 0:
             tv_content['flags'] = flags[0].text
 
-        description = slot.findAll('div',{'class':'tvg_show_description'})
-        if len(description) > 0:
-            tv_content['description'] = description[0].text
 
         category = slot.findAll('span',{'class':'tvg_show_category'})
         if len(category) > 0:
