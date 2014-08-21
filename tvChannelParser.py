@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup  # To get everything
 class Channel:
     def __init__(self, channel, language, channel_query_parameter):
         self.channel_document = {}
-        self.channel_document['name'] = channel
+        self.channel_document['name'] = channel.upper()
         self.channel_document['language'] = language
         self.query_parameter = channel_query_parameter
 
