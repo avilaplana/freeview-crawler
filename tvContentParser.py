@@ -1,12 +1,17 @@
 #!/usr/local/bin/python
 
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
+import pytz
 
 def parseDateTime(startTime):
     hour = int(startTime.split(':')[0])
     minute = int(startTime.split(':')[1])
-    return datetime.now().replace(hour=int(hour), minute=int(minute), second=0, microsecond=0)
+    tv_start_time = datetime.now().replace(hour=int(hour), minute=int(minute), second=0, microsecond=0)
+    tz = pytz.timezone('Europe/London')
+    tv_start_uk_time = tz.localize(tv_start_time)
+
+    return tv_start_uk_time
 
 
 def parseSerie(episode_title, serie_title, tv_content, description):
