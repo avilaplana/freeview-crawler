@@ -14,9 +14,12 @@ channelCollection.drop()
 contentCollection = db['tvContent']
 contentCollection.drop()
 
+tv_listing_url = 'http://tvlistings.theguardian.com/'
+tv_listing_html_loaded = urllib2.urlopen(tv_listing_url).read()
+
 tv_channels_url = 'http://tvlistings.theguardian.com/text-only'
 channels_html_loaded = urllib2.urlopen(tv_channels_url).read()
-list_channels = parseToTVChannels(channels_html_loaded)
+list_channels = parseToTVChannels(channels_html_loaded, tv_listing_html_loaded)
 for channel in list_channels:
     channel_document = channel.channel_document
     # print channel_document

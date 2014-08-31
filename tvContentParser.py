@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta, tzinfo
+from datetime import datetime, timedelta
 import pytz
 
 def parseDateTime(startTime):
