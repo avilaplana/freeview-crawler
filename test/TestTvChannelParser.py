@@ -7,9 +7,12 @@ from tvChannelParser import parseToTVChannels
 class TestTvChannelParser(unittest.TestCase):
 
     def test_shuffle(self):
+        tv_listing_url = 'http://tvlistings.theguardian.com/'
+        tv_listing_html_loaded = urllib2.urlopen(tv_listing_url).read()
+
         tv_channels_url = 'http://tvlistings.theguardian.com/text-only'
         channels_html_loaded = urllib2.urlopen(tv_channels_url).read()
-        list_channels = parseToTVChannels(channels_html_loaded)
+        list_channels = parseToTVChannels(channels_html_loaded, tv_listing_html_loaded)
         for channel in list_channels:
             print "Testing channel parsing" + str(channel.channel_document)
             self.assertTrue(channel.channel_document["name"] is not "", "name in channel does not exist")

@@ -4,7 +4,7 @@ import unittest
 import urllib2
 from tvChannelGenreParser import parseToChannelGenre
 
-class TestTvChannelParser(unittest.TestCase):
+class TestTtvChannelGenreParser(unittest.TestCase):
 
     def test_shuffle(self):
         list_categories = ['KIDS','SHOPPING','ENTERTAINMENT','DOCUMENTARIES','ALL CHANNELS','MOVIES','LIFESTYLE & CULTURE','MUSIC','RELIGION','NEWS','INTERNATIONAL','SPORTS']
