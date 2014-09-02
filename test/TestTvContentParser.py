@@ -25,9 +25,13 @@ class TestTvChannelParser(unittest.TestCase):
             if "program" in document:
                 self.assertTrue(document['program']['title'] is not "", "title is empty")
                 self.assertTrue(document['program']["description"] is not "", "description does not exist")
+                # FIXME self.assertTrue('/'.join(document['category']) not in document['program']["description"], "description contains category")
             if "serie" in document:
                 self.assertTrue(document['serie']['serieTitle'] is not "", "serieTitle is empty")
                 self.assertTrue(document['serie']["description"] is not "", "description does not exist")
+
+                # FIXME self.assertTrue('/'.join(document['category']) not in document['serie']["description"], "description contains category")
+
                 if "seasonNumber" in document['serie']:
                     self.assertTrue(document['serie']['seasonNumber'] is not "", "seasonNumber is empty")
                 if "episodeNumber" in document['serie']:

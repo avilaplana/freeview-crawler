@@ -14,12 +14,13 @@ def parseDateTime(startTime):
     return tv_start_uk_time
 
 
-def parseSerie(episode_title, serie_title, tv_content, description):
+def parseSerie(episode_title, serie_title, tv_content, description, category):
     tv_content['serie'] = {}
     tv_content['serie']['serieTitle'] = serie_title
 
     if len(description) > 0:
-        tv_content['serie']['description'] = description[0].text
+        category_joined = '/'.join(category)
+        tv_content['serie']['description'] = description[0].text.replace(category_joined, '.')
     if 'Series' in episode_title and 'Episode' in episode_title:
         split_episode = episode_title.split('.')
         season_number = split_episode[0]
@@ -38,14 +39,16 @@ def parseSerie(episode_title, serie_title, tv_content, description):
     else:
         tv_content['serie']['episodeTitle'] = episode_title
 
-def parseProgram(program_title, tv_content, description):
+def parseProgram(program_title, tv_content, description, category):
     tv_content['program'] = {}
     tv_content['program']['title'] = program_title
     if len(description) > 0:
-        tv_content['program']['description'] = description[0].text
+        category_joined = '/'.join(category)
+        tv_content['program']['description'] = description[0].text.replace(category_joined, '.')
 
 def parseCategory(category):
     return category.split('/')
+
 
 def parseToTVContent(channel, data):
 
@@ -66,20 +69,21 @@ def parseToTVContent(channel, data):
         show_title =  slot.findAll('span',{'class':'tvg_show_title'})
         episode_title =  slot.findAll('div',{'class':'tvg_show_episode_title'})
 
+        category = slot.findAll('span',{'class':'tvg_show_category'})
+        if len(category) > 0:
+            tv_content['category'] = parseCategory(category[0].text)
+
         description = slot.findAll('div',{'class':'tvg_show_description'})
         if len(episode_title) > 0:
-            parseSerie(episode_title[0].text, show_title[0].text, tv_content, description)
+            parseSerie(episode_title[0].text, show_title[0].text, tv_content, description, tv_content['category'])
         else:
-            parseProgram(show_title[0].text, tv_content, description)
+            parseProgram(show_title[0].text, tv_content, description, tv_content['category'])
 
         flags =  slot.findAll('span',{'class':'tvg_show_flags'})
         if len(flags) > 0:
             tv_content['flags'] = flags[0].text
 
 
-        category = slot.findAll('span',{'class':'tvg_show_category'})
-        if len(category) > 0:
-            tv_content['category'] = parseCategory(category[0].text)
 
         programs.append(tv_content)
 
