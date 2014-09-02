@@ -44,6 +44,9 @@ def parseProgram(program_title, tv_content, description):
     if len(description) > 0:
         tv_content['program']['description'] = description[0].text
 
+def parseCategory(category):
+    return category.split('/')
+
 def parseToTVContent(channel, data):
 
     soup = BeautifulSoup(data)
@@ -76,7 +79,7 @@ def parseToTVContent(channel, data):
 
         category = slot.findAll('span',{'class':'tvg_show_category'})
         if len(category) > 0:
-            tv_content['category'] = category[0].text
+            tv_content['category'] = parseCategory(category[0].text)
 
         programs.append(tv_content)
 

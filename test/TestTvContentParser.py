@@ -19,7 +19,7 @@ class TestTvChannelParser(unittest.TestCase):
 
             if "flags" in document:
                 self.assertTrue(document["flags"] is not "", "flags is empty")
-            self.assertTrue(document["category"] is not "", "category does not exist")
+            self.assertTrue(type(document["category"]) is list, "category is not a list")
             self.assertTrue(type(document["startTime"]) is datetime)
             self.assertTrue(type(document["endTime"]) is datetime)
             if "program" in document:
