@@ -49,6 +49,17 @@ def parseProgram(program_title, tv_content, description, category):
 def parseCategory(category):
     return category.split('/')
 
+def parseAccessibility(tv_content, flags):
+    if len(flags) > 0:
+        tv_content["accessibility"] = []
+        if "SUB" in flags:
+            tv_content["accessibility"].append("Subtitles")
+        if "AD" in flags:
+            tv_content["accessibility"].append("Audio described")
+        if "HD" in flags:
+            tv_content["accessibility"].append("High definition")
+        # if "BW" in flags: //TODO find out what this is
+        #     tv_content["accessibility"].append("highDefinition")
 
 def parseToTVContent(channel, data):
 
@@ -81,7 +92,8 @@ def parseToTVContent(channel, data):
 
         flags =  slot.findAll('span',{'class':'tvg_show_flags'})
         if len(flags) > 0:
-            tv_content['flags'] = flags[0].text
+            parseAccessibility(tv_content, flags[0].text)
+            # tv_content['flags'] = flags[0].text
 
 
 

@@ -17,8 +17,10 @@ class TestTvChannelParser(unittest.TestCase):
             print "Testing content parsing" + str(document)
             self.assertTrue(document["channel"] is not "", "channel name does not exist")
 
-            if "flags" in document:
-                self.assertTrue(document["flags"] is not "", "flags is empty")
+            if "accessibility" in document:
+                self.assertTrue(type(document["accessibility"]) is list, "accessibiliy is not a list")
+                self.assertTrue(len(document["accessibility"]) > 0, "accessibility is empty")
+
             self.assertTrue(type(document["category"]) is list, "category is not a list")
             self.assertTrue(type(document["startTime"]) is datetime)
             self.assertTrue(type(document["endTime"]) is datetime)
