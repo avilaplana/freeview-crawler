@@ -47,7 +47,8 @@ def parseProgram(program_title, tv_content, description, category):
         tv_content['program']['description'] = description[0].text.replace(category_joined, '.')
 
 def parseCategory(category):
-    return category.split('/')
+    categories = category.split('/')
+    return [c.upper() for c in categories]
 
 def parseAccessibility(tv_content, flags):
     if len(flags) > 0:
