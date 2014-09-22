@@ -2,7 +2,7 @@
 
 import re
 from bs4 import BeautifulSoup  # To get everything
-from tvChannelGenreParser import parseToChannelGenre
+
 
 class Channel:
     def __init__(self, channel, language, channel_query_parameter, genre):
@@ -18,8 +18,7 @@ def findGenreByChannel(channel, genre_channel):
             return genre
     return "ENTERTAINMENT"
 
-def parseToTVChannels(channel_html, listing_tv_html):
-    genre_channel = parseToChannelGenre(listing_tv_html)
+def parseToTVChannels(channel_html, genre_channel):
     soup = BeautifulSoup(channel_html)
     slots = soup.body.find('span', {'id': '_ctl0_main_channelList'})
     lists = slots.findAll('a', {'href': re.compile('../*')})
