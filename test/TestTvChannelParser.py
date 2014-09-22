@@ -3,6 +3,7 @@
 import unittest
 import urllib2
 from tvChannelParser import parseToTVChannels
+from tvChannelGenreParser import parseToChannelGenre
 
 class TestTvChannelParser(unittest.TestCase):
 
@@ -12,7 +13,8 @@ class TestTvChannelParser(unittest.TestCase):
 
         tv_channels_url = 'http://tvlistings.theguardian.com/text-only'
         channels_html_loaded = urllib2.urlopen(tv_channels_url).read()
-        list_channels = parseToTVChannels(channels_html_loaded, tv_listing_html_loaded)
+        genre_channel_list = parseToChannelGenre(tv_listing_html_loaded)
+        list_channels = parseToTVChannels(channels_html_loaded, genre_channel_list)
         for channel in list_channels:
             print "Testing channel parsing" + str(channel.channel_document)
             self.assertTrue(channel.channel_document["name"] is not "", "name in channel does not exist")

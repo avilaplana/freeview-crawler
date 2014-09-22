@@ -18,14 +18,14 @@ def findGenreByChannel(channel, genre_channel):
             return genre
     return "ENTERTAINMENT"
 
-def parseToTVChannels(channel_html, genre_channel):
+def parseToTVChannels(channel_html, genre_channel_list):
     soup = BeautifulSoup(channel_html)
     slots = soup.body.find('span', {'id': '_ctl0_main_channelList'})
     lists = slots.findAll('a', {'href': re.compile('../*')})
     channel_list = []
     for channel in lists:
         query_parameter = channel.get('href').replace("..", "")
-        genre = findGenreByChannel(channel.text, genre_channel)
+        genre = findGenreByChannel(channel.text, genre_channel_list)
         channel_list.append(Channel(channel.text, "EN", query_parameter, genre))
 
     return channel_list
