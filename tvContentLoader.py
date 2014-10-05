@@ -99,24 +99,25 @@ def title_film_details(tv_film_content, title):
 
 def content_details(match, tv_type_content):
     import re
-    a = re.findall('\. Starring.*',match)
-    if len(a) > 0:
-        tv_type_content['description'] = re.sub('\. Starring.*', '', match)
-        actors = re.sub('\. Starring ','',a[0])
-        tv_type_content['actors'] = parseActors(actors)
-    else:
-        b = re.findall('\..*, starring.*',match)
-        if len(b) > 0:
-            tv_type_content['description'] = re.sub('\..*, starring.*', '', match)
-            tv_type_content['category'] = re.match('\. (.*),', b[0].split(' starring ')[0]).group(1)
-            ac = b[0].split(' starring ')[1]
-            if '.' in ac:
-                actors = re.match('(.*)\..*', ac).group(1)
-                tv_type_content['actors'] = parseActors(actors)
+    if len(match) > 0:
+        a = re.findall('\. Starring.*',match)
+        if len(a) > 0:
+            tv_type_content['description'] = re.sub('\. Starring.*', '', match)
+            actors = re.sub('\. Starring ','',a[0])
+            tv_type_content['actors'] = parseActors(actors)
+        else:
+            b = re.findall('\..*, starring.*',match)
+            if len(b) > 0:
+                tv_type_content['description'] = re.sub('\..*, starring.*', '', match)
+                tv_type_content['category'] = re.match('\. (.*),', b[0].split(' starring ')[0]).group(1)
+                ac = b[0].split(' starring ')[1]
+                if '.' in ac:
+                    actors = re.match('(.*)\..*', ac).group(1)
+                    tv_type_content['actors'] = parseActors(actors)
 
-            else:
-                tv_type_content['actors'] = parseActors(ac)
-        else: tv_type_content['description'] = match
+                else:
+                    tv_type_content['actors'] = parseActors(ac)
+            else: tv_type_content['description'] = match
 
 
 
