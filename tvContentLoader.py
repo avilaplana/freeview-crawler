@@ -9,16 +9,16 @@ from bs4 import BeautifulSoup
 
 from pymongo import MongoClient
 
-# client = MongoClient('localhost', 27017)
-# db = client['freeview']
+client = MongoClient('localhost', 27017)
+db = client['freeview']
 # channelCollection = db['tvChannel']
 # channelCollection.drop()
 #
 # genreChannelCollection = db['tvChannelGenre']
 # genreChannelCollection.drop()
 #
-# contentCollection = db['tvContent']
-# contentCollection.drop()
+contentCollection = db['tvContent']
+contentCollection.drop()
 #
 # genreContentCollection = db['tvContentGenre']
 # genreContentCollection.drop()
@@ -94,8 +94,7 @@ def title_film_details(tv_film_content, title):
     film_title = str(re.sub('FILM: ','',title))
     year_in_parenthesis = re.match('.*(\([0-9]+\))', film_title).group(1)
     tv_film_content['year'] = re.match('\(([0-9]+)\)', year_in_parenthesis).group(1)
-    title_without_FILM = re.sub('FILM: ','',title)
-    title_without_date = re.sub('.*(\([0-9]+\))','',title_without_FILM)
+    title_without_date = re.sub('(\([0-9]+\))','',film_title)
     tv_film_content['title'] = str(title_without_date)
 
 def content_details(match, tv_type_content):
@@ -134,7 +133,7 @@ def findContent(year, month, day, time_to_search, channels_content_start_time, t
 
     for slot in slots:
         channel = slot.find("div", { "class" : "channel_name" }).text
-        programs = slot.findAll("div", { "class" : "programme " })
+        programs = slot.findAll("div", {'class' : re.compile('programme')})
 
         for program in programs:
             tv_content = {}
@@ -146,7 +145,7 @@ def findContent(year, month, day, time_to_search, channels_content_start_time, t
                 if tv_content['start'] not in channels_content_start_time[channel]:
                     channels_content_start_time[channel].append(tv_content['start'])
                     content_in_interval.append(tv_content)
-                else: print 'duplicated ' + str(tv_content)
+                # else: print 'duplicated ' + str(tv_content)
             else:
                 channels_content_start_time[channel] = []
                 channels_content_start_time[channel].append(tv_content['start'])
@@ -160,9 +159,8 @@ day = datetime.now().day
 month = datetime.now().month
 year = datetime.now().year
 
-# hours = ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am',
-#          '12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm']
-hours = ['7pm']
+hours = ['12am','2am','4am', '6am','8am', '10am','12pm', '2pm', '4pm', '6pm', '8pm', '10pm']
+# hours = ['8pm', '10pm']
 # findContent(year, month, day,'8pm')
 channels_contenr_start_time = {}
 content_in_interval = []
@@ -170,8 +168,7 @@ for hour in hours:
     print "------------------------" + hour
     partial_content = findContent(year, month, day, hour, channels_contenr_start_time)
     for content in partial_content:
-        if 'BBC One' in content["channel"]:
-            print str(content['start']) + '-' + str(content['end'])
+        contentCollection.insert(content)
 
 
 
