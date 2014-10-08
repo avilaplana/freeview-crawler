@@ -32,7 +32,7 @@ def parseActors(actors):
 
 def parse_content(tv_content_html, title, tv_content):
     m = re.search('<div class=\'prog_pre_content\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
-    description_html = m.group(1)
+    description_html = m.group(1).strip()
 
     if ('Episode' in description_html and 'Series' in description_html):
         tv_content['series'] = {}
@@ -167,7 +167,7 @@ for tag_url in tags:
         all_content_url = tag_url
 
 hours = ['12am','2am','4am', '6am','8am', '10am','12pm', '2pm', '4pm', '6pm', '8pm', '10pm']
-# # hours = ['8pm', '10pm']
+# hours = ['12am']
 # # findContent(year, month, day,'8pm')
 channels_contenr_start_time = {}
 for hour in hours:
@@ -176,6 +176,10 @@ for hour in hours:
     print telegraph_url
     partial_content = findContent(channels_contenr_start_time, telegraph_url)
     for content in partial_content:
+        # if 'series' in content and 'category' in content['series']: print content['series']['category']
+        # if 'film' in content and 'category' in content['film']: print content['film']['category']
+        # if 'program' in content: print content['program']['category']
+
         contentCollection.insert(content)
 
 
