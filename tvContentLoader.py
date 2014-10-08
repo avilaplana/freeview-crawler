@@ -72,7 +72,7 @@ def series(description_html, serie_title, tv_content_series):
         parse_series_details(tv_content_series, episode_details_html)
     else: # no episode name
         season_number = episode_html.split('- Episode ')[0].split('Series ')[1]
-        tv_content_series['seasonNumber'] = season_number
+        tv_content_series['seasonNumber'] = season_number.strip()
         tv_content_series['serieTitle'] = serie_title
         parse_series_details(tv_content_series, episode_html)
 
@@ -110,18 +110,6 @@ def content_details(description_html, tv_type_content):
                 else:
                     tv_type_content['actors'] = parseActors(ac)
             else: tv_type_content['description'] = description_html.strip()
-
-
-# { this is a bug
-# 	"_id" : ObjectId("54331a45ad921d682c3c3f85"),
-# 	"start" : ISODate("2014-10-06T01:35:00Z"),
-# 	"program" : {
-# 		"description" : "",
-# 		"title" : "Weather for the Week Ahead"
-# 	},
-# 	"end" : ISODate("2014-10-06T01:40:00Z"),
-# 	"channel" : "BBC ONE"
-# }
 
 def findContent(channels_content_start_time, telegraph_url):
     all_content_html = urllib2.urlopen(telegraph_url).read()
