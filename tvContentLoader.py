@@ -23,6 +23,7 @@ def parse_time(tv_content_html, tv_content):
     end = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + m.group(1).split('-')[1]
     tv_content['start'] = datetime.strptime( start, '%m %d %Y %I.%M%p')
     tv_content['end'] = datetime.strptime( end, '%m %d %Y %I.%M%p')
+    print tv_content['start']
 
 def parseActors(actors):
     import numpy as np
@@ -61,7 +62,8 @@ def parse_series_details(tv_content_series, tv_content_series_html):
 def series(description_html, serie_title, tv_content_series):
 
     import re
-    episode_html = description_html.split('<br /><br /> ')[0]
+    description_html_parts = description_html.split('<br /><br /> ')
+    episode_html = description_html_parts[0]
     if '<br>' in description_html:
         episode_title = episode_html.split('<br>')[0]
         episode_details_html = episode_html.split('<br>')[1]
@@ -76,11 +78,12 @@ def series(description_html, serie_title, tv_content_series):
         tv_content_series['serieTitle'] = serie_title
         parse_series_details(tv_content_series, episode_html)
 
-    description = description_html.split('<br /><br /> ')[1]
-    a  = re.findall('\. Starring.*',description)
-    if len(a) == 0:
-        tv_content_series['description'] = description
-    else: content_details(description, tv_content_series)
+    if len(description_html_parts) == 2:
+        description = description_html_parts[1]
+        a  = re.findall('\. Starring.*',description)
+        if len(a) == 0:
+            tv_content_series['description'] = description
+        else: content_details(description, tv_content_series)
 
 def title_film_details(tv_film_content, title):
     film_title = str(re.sub('FILM: ','',title))
@@ -111,6 +114,24 @@ def content_details(description_html, tv_type_content):
                     tv_type_content['actors'] = parseActors(ac)
             else: tv_type_content['description'] = description_html.strip()
 
+# { Bug there is no title and it is compulsory
+# 	"_id" : ObjectId("5435beb5ad921d5ac0c4c57b"),
+# 	"start" : ISODate("2014-10-08T01:00:00Z"),
+# 	"end" : ISODate("2014-10-08T01:30:00Z"),
+# 	"channel" : "BBC THREE",
+# 	"series" : {
+# 		"episodeNumber" : "1",
+# 		"serieTitle" : "The Revolution Will Be Televised",
+# 		"description" : "Dale Maily gets inside the story of guns in America, while James and Barnaby attend a Republican Party Conference",
+# 		"actors" : [
+# 			"Heydon Prowse",
+# 			"Jolyon Rubinstein"
+# 		],
+# 		"totalNumber" : "6",
+# 		"seasonNumber" : "3"
+# 	}
+# }
+
 def findContent(channels_content_start_time, telegraph_url):
     all_content_html = urllib2.urlopen(telegraph_url).read()
 
@@ -128,6 +149,8 @@ def findContent(channels_content_start_time, telegraph_url):
             tv_content["channel"] = parseChannel(channel)
             parse_time(program, tv_content)
             title = parse_title(program)
+            if title == 'Homes Under the Hammer':
+                print 'FOUND'
             parse_content(program, title, tv_content)
 
             if channel in channels_content_start_time:
@@ -155,7 +178,7 @@ for tag_url in tags:
         all_content_url = tag_url
 
 hours = ['12am','2am','4am', '6am','8am', '10am','12pm', '2pm', '4pm', '6pm', '8pm', '10pm']
-# hours = ['12am']
+# hours = ['10pm']
 # # findContent(year, month, day,'8pm')
 channels_contenr_start_time = {}
 for hour in hours:
@@ -163,12 +186,12 @@ for hour in hours:
     telegraph_url = 'http://tvguideuk.telegraph.co.uk/' + url
     print telegraph_url
     partial_content = findContent(channels_contenr_start_time, telegraph_url)
-    for content in partial_content:
+    # for content in partial_content:
         # if 'series' in content and 'category' in content['series']: print content['series']['category']
         # if 'film' in content and 'category' in content['film']: print content['film']['category']
         # if 'program' in content: print content['program']['category']
 
-        contentCollection.insert(content)
+        # contentCollection.insert(content)
 
 
 
