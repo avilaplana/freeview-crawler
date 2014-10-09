@@ -186,12 +186,12 @@ for hour in hours:
     telegraph_url = 'http://tvguideuk.telegraph.co.uk/' + url
     print telegraph_url
     partial_content = findContent(channels_contenr_start_time, telegraph_url)
-    # for content in partial_content:
+    for content in partial_content:
         # if 'series' in content and 'category' in content['series']: print content['series']['category']
         # if 'film' in content and 'category' in content['film']: print content['film']['category']
         # if 'program' in content: print content['program']['category']
 
-        # contentCollection.insert(content)
+        contentCollection.insert(content)
 
 
 
