@@ -11,7 +11,7 @@ channelCollection = db['tvChannel']
 channelCollection.drop()
 
 
-def getChannels(url):
+def get_channels(url):
     url_channels = 'http://tvguideuk.telegraph.co.uk/' + url
     print url
     a = BeautifulSoup(urllib2.urlopen(url_channels).read())
@@ -27,37 +27,37 @@ def add_type_to_channel(channels_classified, channels_by_type, key, value):
         if channel not in channels_classified:
             channels_classified[channel] = {}
             channels_classified[channel][key] = []
-            channels_classified[channel][key].append(value)
-            channels_classified[channel]['name'] = channel
+            channels_classified[channel][key].append(value.upper())
+            channels_classified[channel]['name'] = channel.upper()
         else:
             if key in channels_classified[channel]:
-                channels_classified[channel][key].append(value)
+                channels_classified[channel][key].append(value.upper())
             else:
                 channels_classified[channel][key] = []
-                channels_classified[channel][key].append(value)
+                channels_classified[channel][key].append(value.upper())
     return channels_classified
 
 
-def findChannelClassifed(tags):
+def find_channel_classifed(tags):
     for tag_url in tags:
         # if 'All' in tag_url:
         #     all_channels = getChannels(tag_url)
         if 'Freeview' in tag_url:
-            freeview_channels = getChannels(tag_url)
+            freeview_channels = get_channels(tag_url)
         if 'Terrestrial' in tag_url:
-            terrestrial_channels = getChannels(tag_url)
+            terrestrial_channels = get_channels(tag_url)
         if 'Sky & Cable' in tag_url:
-            cable_all_channels = getChannels(tag_url)
+            cable_all_channels = get_channels(tag_url)
         if 'Films' in tag_url:
-            films_channels = getChannels(tag_url)
+            films_channels = get_channels(tag_url)
         if 'Sport' in tag_url:
-            sport_channels = getChannels(tag_url)
+            sport_channels = get_channels(tag_url)
         if 'News & Doc' in tag_url:
-            news_channels = getChannels(tag_url)
+            news_channels = get_channels(tag_url)
         if 'Kids' in tag_url:
-            kids_channels = getChannels(tag_url)
+            kids_channels = get_channels(tag_url)
         if 'Radio' in tag_url:
-            radio_channels = getChannels(tag_url)
+            radio_channels = get_channels(tag_url)
 
     channels_classified = {}
     add_type_to_channel(channels_classified, freeview_channels, "provider", "FREEVIEW")
@@ -72,6 +72,12 @@ def findChannelClassifed(tags):
 
     return channels_classified
 
+def remove_duplicate_provider(list_providers):
+    unique_providers = set()
+    uniq = [x for x in list_providers if x not in unique_providers and not unique_providers.add(x)]
+    return uniq
+
+
 
 from datetime import datetime
 
@@ -83,17 +89,24 @@ hours = ['12am', '2am', '4am', '6am', '8am', '10am', '12pm', '2pm', '4pm', '6pm'
 channels_classified = {}
 for hour in hours:
     tags = loadHtmlTags(year, month, day, hour, 'All')
-    channels_classified_temp = findChannelClassifed(tags)
+    channels_classified_temp = find_channel_classifed(tags)
     print '-------- ' + hour
-    for channel_temp_classified in channels_classified_temp:
-        if channel_temp_classified in channels_classified:
-            if channels_classified_temp[channel_temp_classified] != channels_classified[channel_temp_classified]:
+    for channel_classified_temp in channels_classified_temp:
+        if channel_classified_temp in channels_classified:
+            if channels_classified_temp[channel_classified_temp] != channels_classified[channel_classified_temp]:
                 print "--------  DIFFERENT"
-                print channels_classified_temp[channel_temp_classified]
-                print channels_classified[channel_temp_classified]
+                print channels_classified_temp[channel_classified_temp]
+                print channels_classified[channel_classified_temp]
         else:
-            channels_classified[channel_temp_classified] = channels_classified_temp[channel_temp_classified]
-            print channel_temp_classified + ' INSERTED'
+            channels_classified[channel_classified_temp] = channels_classified_temp[channel_classified_temp]
+            print channel_classified_temp + ' INSERTED'
 
 for channel in channels_classified:
+    if 'category' not in channels_classified[channel]:
+        channels_classified[channel]['category'] = ['GENERIC']
+    if 'provider' in channels_classified[channel]:
+        channels_classified[channel]['provider']= remove_duplicate_provider(channels_classified[channel]['provider'])
+    else:
+        channels_classified[channel]['provider'] = ['UNKNOWN']
     channelCollection.insert(channels_classified[channel])
+
