@@ -28,7 +28,7 @@ def add_type_to_channel(channels_classified, channels_by_type, key, value):
             channels_classified[channel] = {}
             channels_classified[channel][key] = []
             channels_classified[channel][key].append(value.upper())
-            channels_classified[channel]['name'] = channel.upper()
+            channels_classified[channel]['name'] = parseChannel(channel.upper())
         else:
             if key in channels_classified[channel]:
                 channels_classified[channel][key].append(value.upper())
