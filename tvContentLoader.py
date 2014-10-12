@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from parsingLibrary import loadHtmlTags, parseChannel
 from datetime import timedelta
 from pymongo import MongoClient
+import pytz
 
 client = MongoClient('localhost', 27017)
 db = client['freeview']
@@ -31,11 +32,18 @@ def parse_time(tv_content_html, tv_content, after_noon):
     if not after_noon and 'pm' in start_hour and 'am' in end_hour:
         start_datetime = start_datetime - timedelta(days = 1)
     else:
-        if after_noon and 'am' in end_hour:
+        if after_noon and 'pm' in start_hour and 'am' in end_hour:
             end_datetime = end_datetime + timedelta(days = 1)
+        else:
+            if after_noon and 'am' in start_hour and 'am' in end_hour:
+                start_datetime = start_datetime + timedelta(days = 1)
+                end_datetime = end_datetime + timedelta(days = 1)
 
-    tv_content['start'] = start_datetime
-    tv_content['end'] = end_datetime
+    tz = pytz.timezone('Europe/London')
+    tv_start_uk_time = tz.localize(start_datetime)
+    tv_end_uk_time = tz.localize(start_datetime)
+    tv_content['start'] = tv_start_uk_time
+    tv_content['end'] = tv_end_uk_time
 
 def parse_actors(actors):
     import numpy as np
