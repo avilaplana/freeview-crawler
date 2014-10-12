@@ -41,7 +41,7 @@ def parse_time(tv_content_html, tv_content, after_noon):
 
     tz = pytz.timezone('Europe/London')
     tv_start_uk_time = tz.localize(start_datetime)
-    tv_end_uk_time = tz.localize(start_datetime)
+    tv_end_uk_time = tz.localize(end_datetime)
     tv_content['start'] = tv_start_uk_time
     tv_content['end'] = tv_end_uk_time
 
