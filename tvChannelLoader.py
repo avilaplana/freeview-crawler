@@ -9,6 +9,10 @@ client = MongoClient('localhost', 27017)
 db = client['freeview']
 channelCollection = db['tvChannel']
 channelCollection.drop()
+channelCategoryCollection = db['tvChannelCategory']
+channelCategoryCollection.drop()
+channelProviderCollection = db['tvChannelProvider']
+channelProviderCollection.drop()
 
 
 def get_channels(url):
@@ -110,3 +114,15 @@ for channel in channels_classified:
         channels_classified[channel]['provider'] = ['UNKNOWN']
     channelCollection.insert(channels_classified[channel])
 
+providers = ["FREEVIEW", "TERRESTRIAL", "SKY & CABLE", "UNKOWN"]
+categories = ["FILMS", "SPORTS", "NEWS & DOCUMENTARY", "KIDS", "RADIO", "GENERIC"]
+
+for provider in providers:
+    json_to_insert = {}
+    json_to_insert['provider'] = provider
+    channelProviderCollection.insert(json_to_insert)
+
+for category in categories:
+    json_to_insert = {}
+    json_to_insert['category'] = category
+    channelCategoryCollection.insert(json_to_insert)
