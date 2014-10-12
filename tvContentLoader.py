@@ -28,7 +28,7 @@ def parse_time(tv_content_html, tv_content, after_noon):
     start_datetime = datetime.strptime(start, '%m %d %Y %I.%M%p')
     end_datetime = datetime.strptime(end, '%m %d %Y %I.%M%p')
 
-    if not after_noon and 'pm' in start_hour:
+    if not after_noon and 'pm' in start_hour and 'am' in end_hour:
         start_datetime = start_datetime - timedelta(days = 1)
     else:
         if after_noon and 'am' in end_hour:
@@ -99,12 +99,12 @@ def series(description_html, serie_title, tv_content_series):
             content_details(description, tv_content_series)
 
 def title_film_details(tv_film_content, title):
-    film_title = str(re.sub('FILM: ', '', title))
+    film_title = re.sub('FILM: ', '', title)
     if '(' in film_title and ')' in film_title:
         year_in_parenthesis = re.match('.*(\([0-9]+\))', film_title).group(1)
         tv_film_content['year'] = re.match('\(([0-9]+)\)', year_in_parenthesis).group(1)
         title_without_date = re.sub('(\([0-9]+\))', '', film_title)
-        tv_film_content['title'] = str(title_without_date)
+        tv_film_content['title'] = title_without_date
     else: tv_film_content['title'] = film_title
 
 def content_details(description_html, tv_type_content):
