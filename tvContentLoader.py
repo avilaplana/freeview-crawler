@@ -29,11 +29,19 @@ def parse_time(tv_content_html, tv_content, after_noon):
     start_datetime = datetime.strptime(start, '%m %d %Y %I.%M%p')
     end_datetime = datetime.strptime(end, '%m %d %Y %I.%M%p')
 
-    if not after_noon and 'pm' in start_hour:
+    if not after_noon and 'pm' in start_hour and 'am' in end_hour:
         start_datetime = start_datetime - timedelta(days = 1)
     else:
-        if after_noon and 'am' in end_hour:
-                end_datetime = end_datetime + timedelta(days = 1)
+        if not after_noon and 'pm' in start_hour and 'pm' in end_hour:
+            start_datetime = start_datetime - timedelta(days = 1)
+            end_datetime = end_datetime - timedelta(days = 1)
+        else:
+            if after_noon and 'pm' in start_hour and 'am' in end_hour:
+                    end_datetime = end_datetime + timedelta(days = 1)
+            else:
+                if after_noon and 'am' in start_hour and 'am' in end_hour:
+                    start_datetime = start_datetime + timedelta(days = 1)
+                    end_datetime = end_datetime + timedelta(days = 1)
 
     tz = pytz.timezone('Europe/London')
     tv_start_uk_time = tz.localize(start_datetime)
