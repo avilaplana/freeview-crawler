@@ -143,7 +143,7 @@ def content_details(description_html, tv_type_content):
             else:
                 tv_type_content['description'] = description_html.strip()
 
-def find_content_range_time(channels_content_start_time, telegraph_url, is_after_noon):
+def find_content_range_time(channels_content_start_time, telegraph_url, is_after_noon, list_channels):
     all_content_html = urllib2.urlopen(telegraph_url).read()
 
     soup = BeautifulSoup(all_content_html)
@@ -157,6 +157,10 @@ def find_content_range_time(channels_content_start_time, telegraph_url, is_after
         for program in programs:
             tv_content = {}
             tv_content["channel"] = parseChannel(channel)
+
+            if tv_content["channel"] in list_channels :
+                continue
+
             parse_time(program, tv_content, is_after_noon)
             title = parse_title(program)
             parse_content(program, title, tv_content)
@@ -182,23 +186,27 @@ year = datetime.now().year
 
 tags = loadHtmlTags(year, month, day, '12am', 'All')
 channels_content_start_time = {}
+
+list_channels = set()
 for tag_url in tags:
     if 'Freeview' in tag_url or 'Terrestrial' in tag_url or 'Sky & Cable' in tag_url:
         hours = ['12am', '2am', '4am', '6am', '8am', '10am', '12pm', '2pm', '4pm', '6pm', '8pm', '10pm']
         # hours = ['12am']
+        partial_channels = set()
         for hour in hours:
             url = re.sub('[0-9]*am', hour, tag_url)
             telegraph_url = 'http://tvguideuk.telegraph.co.uk/' + url
             print telegraph_url
-            partial_content = find_content_range_time(channels_content_start_time, telegraph_url, 'pm' in hour)
+            partial_content = find_content_range_time(channels_content_start_time, telegraph_url, 'pm' in hour, list_channels)
 
             for content in partial_content:
                 contentCollection.insert(content)
+                partial_channels.add(content['channel'])
 
+        for channel in partial_channels:
+            list_channels.add(channel)
 
-
-
-
+        print list_channels
 
 
 
