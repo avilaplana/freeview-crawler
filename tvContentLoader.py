@@ -20,41 +20,42 @@ def parse_title(tv_content_html):
     return m.group(1)
 
 
-def parse_time(tv_content_html, tv_content, after_noon):
-    m = re.search('<div class=\'prog_pre_header\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
-    start_hour = m.group(1).split('-')[0]
-    end_hour = m.group(1).split('-')[1]
-    # start = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + start_hour
-    # end = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + end_hour
-    # start_datetime = datetime.strptime(start, '%m %d %Y %I.%M%p')
-    # end_datetime = datetime.strptime(end, '%m %d %Y %I.%M%p')
-    #
-    # if not after_noon and 'pm' in start_hour and 'am' in end_hour:
-    #     start_datetime = start_datetime - timedelta(days = 1)
+def calculate_time(tv_content, after_noon):
+    start = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + tv_content['start']
+    end = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + tv_content['end']
+    start_datetime = datetime.strptime(start, '%m %d %Y %I.%M%p')
+    end_datetime = datetime.strptime(end, '%m %d %Y %I.%M%p')
+    # if not after_noon and 'pm' in tv_content['start']:
+    #     start_datetime = start_datetime - timedelta(days=1)
     # else:
-    #     if not after_noon and 'pm' in start_hour and 'pm' in end_hour:
-    #         start_datetime = start_datetime - timedelta(days = 1)
-    #         end_datetime = end_datetime - timedelta(days = 1)
+    #     if after_noon and 'am' in tv_content['end']:
+    #         end_datetime = end_datetime + timedelta(days = 1)
     #     else:
-    #         if after_noon and 'pm' in start_hour and 'am' in end_hour:
-    #                 end_datetime = end_datetime + timedelta(days = 1)
-    #         else:
-    #             if after_noon and 'am' in start_hour and 'am' in end_hour:
-    #                 start_datetime = start_datetime + timedelta(days = 1)
-    #                 end_datetime = end_datetime + timedelta(days = 1)
-
-    # tz = pytz.timezone('Europe/London')
+    #         if after_noon and 'am' in tv_content['start'] and 'am' in tv_content['end']:
+    #         start_datetime = start_datetime + timedelta(days = 1)
+    #         end_datetime = end_datetime + timedelta(days = 1)
+      # tz = pytz.timezone('Europe/London')
     # tv_start_uk_time = tz.localize(start_datetime)
     # tv_end_uk_time = tz.localize(end_datetime)
     # tv_content['start'] = tv_start_uk_time
     # tv_content['end'] = tv_end_uk_time
+
+def parse_time(tv_content_html, tv_content, after_noon):
+    m = re.search('<div class=\'prog_pre_header\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
+    start_hour = m.group(1).split('-')[0]
+    end_hour = m.group(1).split('-')[1]
+
+
     tv_content['start'] = start_hour
     tv_content['end'] = end_hour
+
+
 def parse_actors(actors):
     import numpy as np
 
     array_actors = actors.replace(' and ', ', ').split(', ')
     return np.array(array_actors).tolist()
+
 
 def parse_content(tv_content_html, title, tv_content):
     m = re.search('<div class=\'prog_pre_content\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
@@ -73,6 +74,7 @@ def parse_content(tv_content_html, title, tv_content):
             tv_content['program']['title'] = title
             content_details(description_html, tv_content['program'])
 
+
 def parse_series_details(tv_content_series, tv_content_series_html):
     episode_numbers = tv_content_series_html.split('- Episode ')[1]
     if 'of' in episode_numbers:
@@ -83,6 +85,7 @@ def parse_series_details(tv_content_series, tv_content_series_html):
     else:
         episode_nummber = episode_numbers.split(' of ')[0]
         tv_content_series['episodeNumber'] = episode_nummber
+
 
 def series(description_html, serie_title, tv_content_series):
     import re
@@ -111,6 +114,7 @@ def series(description_html, serie_title, tv_content_series):
         else:
             content_details(description, tv_content_series)
 
+
 def title_film_details(tv_film_content, title):
     film_title = re.sub('FILM: ', '', title)
     if '(' in film_title and ')' in film_title:
@@ -118,7 +122,9 @@ def title_film_details(tv_film_content, title):
         tv_film_content['year'] = re.match('\(([0-9]+)\)', year_in_parenthesis).group(1)
         title_without_date = re.sub('(\([0-9]+\))', '', film_title)
         tv_film_content['title'] = title_without_date
-    else: tv_film_content['title'] = film_title
+    else:
+        tv_film_content['title'] = film_title
+
 
 def content_details(description_html, tv_type_content):
     import re
@@ -143,6 +149,7 @@ def content_details(description_html, tv_type_content):
                     tv_type_content['actors'] = parse_actors(ac)
             else:
                 tv_type_content['description'] = description_html.strip()
+
 
 def find_content_interval_by_provider(channels_content_start_time, telegraph_url, is_after_noon):
     all_content_html = urllib2.urlopen(telegraph_url).read()
@@ -190,15 +197,21 @@ for tag_url in tags:
             url = re.sub('[0-9]*am', hour, tag_url)
             telegraph_url = 'http://tvguideuk.telegraph.co.uk/' + url
             print telegraph_url
-            partial_content = find_content_interval_by_provider(channels_content_start_time, telegraph_url, 'pm' in hour)
+            partial_content = find_content_interval_by_provider(channels_content_start_time, telegraph_url,
+                                                                'pm' in hour)
             for channel in partial_content:
                 if not channel in all_channels_provider:
                     all_channels_provider[channel] = []
-                print "number of elements " + str(len(all_channels_provider[channel]))
-                all_channels_provider[channel].append(partial_content[channel])
+                all_channels_provider[channel].extend(partial_content[channel])
 
         for channel in all_channels_provider:
-            print channel + ' ' + str(all_channels_provider[channel]) + '-' + str(all_channels_provider[channel])
+            content_in_channel_provider = []
+            [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
+             x not in content_in_channel_provider]
+            for content in content_in_channel_provider:
+                if after_noon and 'pm' in content['end']:
+                    after_noon = False
+                calculate_time(content, after_noon)
 
 
 
