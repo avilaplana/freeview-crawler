@@ -22,3 +22,26 @@ def parseChannel(channel):
     c_2 = c_1.replace(')','')
     return c_2.upper()
 
+def remove_duplicate_elements(list_elements):
+    unique_set = set()
+    uniq = [x for x in list_elements if x not in unique_set and not unique_set.add(x)]
+    return uniq
+
+
+def calculate_24_format(time):
+    if 'am' in time:
+        time = time.replace('am', '')
+        time_hour = int(time.split('.')[0])
+        time_minute = time.split('.')[1]
+        if time_hour == 12:
+            time_hour = time_hour - 12
+        return str(time_hour) + '.' + time_minute
+
+    if 'pm' in time:
+        time = time.replace('pm', '')
+        time_hour = int(time.split('.')[0])
+        time_minute = time.split('.')[1]
+        if time_hour < 12:
+            time_hour = time_hour + 12
+        return str(time_hour) + '.' + time_minute
+

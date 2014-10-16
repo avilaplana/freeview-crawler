@@ -2,7 +2,7 @@
 
 import urllib2
 from bs4 import BeautifulSoup
-from parsingLibrary import loadHtmlTags, parseChannel
+from parsingLibrary import loadHtmlTags, parseChannel, remove_duplicate_elements
 from pymongo import MongoClient
 
 client = MongoClient('localhost', 27017)
@@ -76,13 +76,6 @@ def find_channel_classifed(tags):
 
     return channels_classified
 
-def remove_duplicate_provider(list_providers):
-    unique_providers = set()
-    uniq = [x for x in list_providers if x not in unique_providers and not unique_providers.add(x)]
-    return uniq
-
-
-
 from datetime import datetime
 
 day = datetime.now().day
@@ -109,7 +102,7 @@ for channel in channels_classified:
     if 'category' not in channels_classified[channel]:
         channels_classified[channel]['category'] = ['GENERIC']
     if 'provider' in channels_classified[channel]:
-        channels_classified[channel]['provider']= remove_duplicate_provider(channels_classified[channel]['provider'])
+        channels_classified[channel]['provider']= remove_duplicate_elements(channels_classified[channel]['provider'])
     else:
         channels_classified[channel]['provider'] = ['UNKNOWN']
     channelCollection.insert(channels_classified[channel])

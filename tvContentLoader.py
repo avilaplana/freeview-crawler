@@ -2,7 +2,7 @@
 
 import urllib2
 from bs4 import BeautifulSoup
-from parsingLibrary import loadHtmlTags, parseChannel
+from parsingLibrary import loadHtmlTags, parseChannel, calculate_24_format
 from datetime import timedelta
 from pymongo import MongoClient
 import pytz
@@ -20,34 +20,20 @@ def parse_title(tv_content_html):
     return m.group(1)
 
 
-def calculate_time(tv_content, after_noon):
-    start = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + tv_content['start']
-    end = str(month) + ' ' + str(day) + ' ' + str(year) + ' ' + tv_content['end']
-    start_datetime = datetime.strptime(start, '%m %d %Y %I.%M%p')
-    end_datetime = datetime.strptime(end, '%m %d %Y %I.%M%p')
-    # if not after_noon and 'pm' in tv_content['start']:
-    #     start_datetime = start_datetime - timedelta(days=1)
-    # else:
-    #     if after_noon and 'am' in tv_content['end']:
-    #         end_datetime = end_datetime + timedelta(days = 1)
-    #     else:
-    #         if after_noon and 'am' in tv_content['start'] and 'am' in tv_content['end']:
-    #         start_datetime = start_datetime + timedelta(days = 1)
-    #         end_datetime = end_datetime + timedelta(days = 1)
-      # tz = pytz.timezone('Europe/London')
-    # tv_start_uk_time = tz.localize(start_datetime)
-    # tv_end_uk_time = tz.localize(end_datetime)
-    # tv_content['start'] = tv_start_uk_time
-    # tv_content['end'] = tv_end_uk_time
+def calculate_time(time, delta):
+    date = datetime(year, month, day, int(time.split('.')[0]), int(time.split('.')[1]))
+    date_time = date + timedelta(days = delta)
+    tz = pytz.timezone('Europe/London')
+    date_uk_time = tz.localize(date_time)
+    return date_uk_time
+
 
 def parse_time(tv_content_html, tv_content, after_noon):
     m = re.search('<div class=\'prog_pre_header\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
     start_hour = m.group(1).split('-')[0]
     end_hour = m.group(1).split('-')[1]
-
-
-    tv_content['start'] = start_hour
-    tv_content['end'] = end_hour
+    tv_content['start'] = calculate_24_format(start_hour)
+    tv_content['end'] = calculate_24_format(end_hour)
 
 
 def parse_actors(actors):
@@ -151,7 +137,7 @@ def content_details(description_html, tv_type_content):
                 tv_type_content['description'] = description_html.strip()
 
 
-def find_content_interval_by_provider(channels_content_start_time, telegraph_url, is_after_noon):
+def find_content_interval_by_provider(telegraph_url, is_after_noon):
     all_content_html = urllib2.urlopen(telegraph_url).read()
 
     soup = BeautifulSoup(all_content_html)
@@ -161,9 +147,10 @@ def find_content_interval_by_provider(channels_content_start_time, telegraph_url
     for channel_html in channels_html:
         channel = channel_html.find("div", {"class": "channel_name"}).text
         channel_formatted = parseChannel(channel)
+        if channel_formatted in channel_already_crawled:
+            continue
 
         programs = channel_html.findAll("div", {'class': re.compile('programme')})
-
         for program in programs:
             tv_content = {}
             tv_content["channel"] = channel_formatted
@@ -177,6 +164,49 @@ def find_content_interval_by_provider(channels_content_start_time, telegraph_url
 
     return content_in_interval
 
+def fix_date_in_dat(content_in_channel_provider):
+    current_day = False
+    after_noon = False
+    for content in content_in_channel_provider:
+        if not current_day:
+            if int(content['start'].split('.')[0]) > 12:
+                content['start'] = calculate_time(content['start'], -1)
+            else:
+                content['start'] = calculate_time(content['start'], 0)
+                current_day = True
+        else:
+            if not after_noon:
+                if int(content['start'].split('.')[0]) < 12:
+                    content['start'] = calculate_time(content['start'],0)
+                else:
+                    after_noon = True
+                    content['start'] = calculate_time(content['start'], 0)
+            else:
+                if after_noon:
+                    if int(content['start'].split('.')[0]) < 12:
+                        content['start'] = calculate_time(content['start'], 1)
+                    else:
+                        content['start'] = calculate_time(content['start'], 0)
+
+        if not current_day:
+            if int(content['end'].split('.')[0]) > 12:
+                content['end'] = calculate_time(content['end'], -1)
+            else:
+                content['end'] = calculate_time(content['end'], 0)
+                current_day = True
+        else:
+            if not after_noon:
+                if int(content['end'].split('.')[0]) < 12:
+                    content['end'] = calculate_time(content['end'],0)
+                else:
+                    after_noon = True
+                    content['end'] = calculate_time(content['end'],0)
+            else:
+                if after_noon:
+                    if int(content['end'].split('.')[0]) < 12:
+                        content['end'] = calculate_time(content['end'],1)
+                    else:
+                        content['end'] = calculate_time(content['end'],0)
 
 from datetime import datetime
 
@@ -185,11 +215,10 @@ month = datetime.now().month
 year = datetime.now().year
 
 tags = loadHtmlTags(year, month, day, '12am', 'All')
-channels_content_start_time = {}
-
+channel_already_crawled = set()
 for tag_url in tags:
-    # if 'Freeview' in tag_url or 'Terrestrial' in tag_url or 'Sky & Cable' in tag_url:
-    if 'Freeview' in tag_url:
+    if 'Freeview' in tag_url or 'Terrestrial' in tag_url or 'Sky & Cable' in tag_url:
+    # if 'Sky & Cable' in tag_url:
         hours = ['12am', '2am', '4am', '6am', '8am', '10am', '12pm', '2pm', '4pm', '6pm', '8pm', '10pm']
         # hours = ['12am']
         all_channels_provider = {}
@@ -197,7 +226,7 @@ for tag_url in tags:
             url = re.sub('[0-9]*am', hour, tag_url)
             telegraph_url = 'http://tvguideuk.telegraph.co.uk/' + url
             print telegraph_url
-            partial_content = find_content_interval_by_provider(channels_content_start_time, telegraph_url,
+            partial_content = find_content_interval_by_provider(telegraph_url,
                                                                 'pm' in hour)
             for channel in partial_content:
                 if not channel in all_channels_provider:
@@ -205,13 +234,18 @@ for tag_url in tags:
                 all_channels_provider[channel].extend(partial_content[channel])
 
         for channel in all_channels_provider:
+            channel_already_crawled.add(channel)
             content_in_channel_provider = []
             [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
              x not in content_in_channel_provider]
+
+            fix_date_in_dat(content_in_channel_provider)
             for content in content_in_channel_provider:
-                if after_noon and 'pm' in content['end']:
-                    after_noon = False
-                calculate_time(content, after_noon)
+                contentCollection.insert(content)
+
+
+
+
 
 
 
