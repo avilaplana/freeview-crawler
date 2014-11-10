@@ -136,9 +136,6 @@ def content_details(description_html, tv_type_content):
             else:
                 tv_type_content['description'] = description_html.strip()
 
-def parse_provider(tag_url):
-    return re.match('.*&tabname=(.*)&.*', tag_url).group(1)
-
 
 def find_content_interval_by_provider(telegraph_url, is_after_noon):
     all_content_html = urllib2.urlopen(telegraph_url).read()
@@ -157,7 +154,6 @@ def find_content_interval_by_provider(telegraph_url, is_after_noon):
         for program in programs:
             tv_content = {}
             tv_content["channel"] = channel_formatted
-            tv_content["provider"] = parse_provider(tag_url).upper()   
             parse_time(program, tv_content, is_after_noon)
             title = parse_title(program)
 
