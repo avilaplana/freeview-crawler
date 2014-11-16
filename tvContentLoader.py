@@ -63,12 +63,12 @@ def parse_content(tv_content_html, title, tv_content):
 
 def parse_series_details(tv_content_series, tv_content_series_html):
     episode_numbers = tv_content_series_html.split('- Episode ')[1]
-    if 'of' in episode_numbers:
+    if 'of' in episode_numbers: # u'Series 1 - Episode 2 of 6'
         episode_nummber = episode_numbers.split(' of ')[0]
         total_number = episode_numbers.split(' of ')[1]
         tv_content_series['episodeNumber'] = episode_nummber
         tv_content_series['totalNumber'] = total_number
-    else:
+    else: # u'Series 1 - Episode 156'
         episode_nummber = episode_numbers.split(' of ')[0]
         tv_content_series['episodeNumber'] = episode_nummber
 
@@ -78,7 +78,7 @@ def series(description_html, serie_title, tv_content_series):
 
     description_html_parts = description_html.split('<br /><br /> ')
     episode_html = description_html_parts[0]
-    if '<br>' in description_html:
+    if '<br>' in description_html: # u'Into Spring<br>Series 1 - Episode 2 of 6<br /><br /> During March and April, ....'
         episode_title = episode_html.split('<br>')[0]
         episode_details_html = episode_html.split('<br>')[1]
         season_number = episode_details_html.split('- Episode ')[0].split('Series ')[1]
@@ -86,11 +86,17 @@ def series(description_html, serie_title, tv_content_series):
         tv_content_series['episodeTitle'] = episode_title
         tv_content_series['seasonNumber'] = season_number.strip()
         parse_series_details(tv_content_series, episode_details_html)
-    else:  # no episode name
-        season_number = episode_html.split('- Episode ')[0].split('Series ')[1]
-        tv_content_series['seasonNumber'] = season_number.strip()
-        tv_content_series['serieTitle'] = serie_title
-        parse_series_details(tv_content_series, episode_html)
+    else:
+        # Series 1<br /><br /> Episodes one to five of the comedy starring Patricia Routledge and Prunella Scales
+        if '- Episode ' not in description_html:
+            tv_content_series['serieTitle'] = serie_title
+            series_season = description_html_parts[0].split('Series ')[1]
+            tv_content_series['seasonNumber'] = series_season.strip()
+        else:  # Series 2 - Episode 7 of 14<br /><br /> Matt and Jess receive an official warning ......
+            season_number = episode_html.split('- Episode ')[0].split('Series ')[1]
+            tv_content_series['seasonNumber'] = season_number.strip()
+            tv_content_series['serieTitle'] = serie_title
+            parse_series_details(tv_content_series, episode_html)
 
     if len(description_html_parts) == 2:
         description = description_html_parts[1]
