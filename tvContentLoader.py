@@ -140,8 +140,7 @@ def content_details(description_html, tv_type_content):
                 else:
                     tv_type_content['actors'] = parse_actors(ac)
             else:
-                tv_type_content['description'] = description_html.strip()
-
+                tv_type_content['description'] = description_html.replace('<br>', '').strip()
 
 def find_content_interval_by_provider(telegraph_url, is_after_noon):
     all_content_html = urllib2.urlopen(telegraph_url).read()
