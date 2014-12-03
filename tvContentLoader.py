@@ -124,13 +124,13 @@ def content_details(description_html, tv_type_content):
     if len(description_html) > 0:
         a = re.findall('\. Starring.*', description_html)
         if len(a) > 0:
-            tv_type_content['description'] = re.sub('\. Starring.*', '', description_html).strip()
+            tv_type_content['description'] = re.sub('\. Starring.*', '', description_html).replace('<br>', '.').strip()
             actors = re.sub('\. Starring ', '', a[0])
             tv_type_content['actors'] = parse_actors(actors)
         else:
             b = re.findall('\..*, starring.*', description_html)
             if len(b) > 0:
-                tv_type_content['description'] = re.sub('\..*, starring.*', '', description_html).strip()
+                tv_type_content['description'] = re.sub('\..*, starring.*', '', description_html).replace('<br>', '.').strip()
                 tv_type_content['category'] = re.match('\. (.*),', b[0].split(' starring ')[0]).group(1).upper()
                 ac = b[0].split(' starring ')[1]
                 if '.' in ac:
