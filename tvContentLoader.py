@@ -42,12 +42,23 @@ def parse_actors(actors):
     array_actors = actors.replace(' and ', ', ').split(', ')
     return np.array(array_actors).tolist()
 
+def is_series(description_html):
+    import re
+
+    if ('Episode' in description_html and 'Series' in description_html):
+        return True
+
+    a = re.findall('.*Series [0-999999].*', description_html)
+    if len(a) == 1:
+        return True
+
+    return False
 
 def parse_content(tv_content_html, title, tv_content):
     m = re.search('<div class=\'prog_pre_content\'>(.+?)</div>', tv_content_html['onmouseover'].replace('\\', ''))
     description_html = m.group(1).strip()
 
-    if ('Episode' in description_html and 'Series' in description_html):
+    if is_series(description_html):
         tv_content['series'] = {}
         series(description_html, title, tv_content['series'])
     else:
@@ -78,16 +89,23 @@ def series(description_html, serie_title, tv_content_series):
 
     description_html_parts = description_html.split('<br /><br /> ')
     episode_html = description_html_parts[0]
-    if '<br>' in description_html: # u'Into Spring<br>Series 1 - Episode 2 of 6<br /><br /> During March and April, ....'
+    if '<br>' in description_html:
         episode_title = episode_html.split('<br>')[0]
         episode_details_html = episode_html.split('<br>')[1]
-        season_number = episode_details_html.split('- Episode ')[0].split('Series ')[1]
-        tv_content_series['serieTitle'] = serie_title
-        tv_content_series['episodeTitle'] = episode_title
-        tv_content_series['seasonNumber'] = season_number.strip()
-        parse_series_details(tv_content_series, episode_details_html)
+        if '- Episode ' in episode_details_html: # u'Into Spring<br>Series 1 - Episode 2 of 6<br /><br /> During March and April, ....'
+            season_number = episode_details_html.split('- Episode ')[0].split('Series ')[1]
+            tv_content_series['serieTitle'] = serie_title
+            tv_content_series['episodeTitle'] = episode_title
+            tv_content_series['seasonNumber'] = season_number.strip()
+            parse_series_details(tv_content_series, episode_details_html)
+        else: # u'Christmas Special 1995 - The Pageant<br>Series 5<br /><br /> Christmas special from 1995. Hyacinth gets ...'
+            season_number = episode_details_html.split('Series ')[1]
+            tv_content_series['serieTitle'] = serie_title
+            tv_content_series['episodeTitle'] = episode_title
+            tv_content_series['seasonNumber'] = season_number.strip()
     else:
-        # Series 1<br /><br /> Episodes one to five of the comedy starring Patricia Routledge and Prunella Scales
+        # example 1: Series 1<br /><br /> Episodes one to five of the comedy starring Patricia Routledge and Prunella Scales
+        # example 2: Series 8<br /><br />
         if '- Episode ' not in description_html:
             tv_content_series['serieTitle'] = serie_title
             series_season = description_html_parts[0].split('Series ')[1]
