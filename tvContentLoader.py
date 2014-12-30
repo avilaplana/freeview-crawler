@@ -98,11 +98,23 @@ def series(description_html, serie_title, tv_content_series):
             tv_content_series['episodeTitle'] = episode_title
             tv_content_series['seasonNumber'] = season_number.strip()
             parse_series_details(tv_content_series, episode_details_html)
-        else: # u'Christmas Special 1995 - The Pageant<br>Series 5<br /><br /> Christmas special from 1995. Hyacinth gets ...'
-            season_number = episode_details_html.split('Series ')[1]
-            tv_content_series['serieTitle'] = serie_title
-            tv_content_series['episodeTitle'] = episode_title
-            tv_content_series['seasonNumber'] = season_number.strip()
+        else:
+            series_description = episode_details_html.split('Series ')
+            if len(series_description) == 1: # u'Series 16 Compilations 2<br> Harry Hill showcases some of the best celebrity      ...'
+                tv_content_series['serieTitle'] = serie_title
+                tv_content_series['episodeTitle'] = episode_title
+                description = description_html.split('<br> ')[1]
+                a = re.findall('\. Starring.*', description)
+                if len(a) == 0:
+                    tv_content_series['description'] = description
+                else:
+                    content_details(description, tv_content_series)
+            else:
+                # u'Christmas Special 1995 - The Pageant<br>Series 5<br /><br /> Christmas special from 1995. Hyacinth gets ...'
+                season_number = episode_details_html.split('Series ')[1]
+                tv_content_series['serieTitle'] = serie_title
+                tv_content_series['episodeTitle'] = episode_title
+                tv_content_series['seasonNumber'] = season_number.strip()
     else:
         # example 1: Series 1<br /><br /> Episodes one to five of the comedy starring Patricia Routledge and Prunella Scales
         # example 2: Series 8<br /><br />
@@ -237,6 +249,10 @@ day = datetime.now().day
 month = datetime.now().month
 year = datetime.now().year
 
+# month = 1
+# year = 2015
+# myDAys = [1,2,3,4,5,6,7,8,9,10]
+# for day in myDAys:
 tags = loadHtmlTags(year, month, day, '12am', 'All')
 channel_already_crawled = set()
 for tag_url in tags:
