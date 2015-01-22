@@ -20,3 +20,6 @@ def find_all_films():
 
 def find_all_series():
     return _find_all("series", "serieTitle")
+
+def aggregate_extra_content(id, extra):
+    contentCollection.update({"_id":id},{"$set": {"extra": extra}}, multi = True)
