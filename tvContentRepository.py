@@ -6,7 +6,7 @@ db = client['freeview']
 contentCollection = db['tvContent']
 
 def _find_all(type, title):
-    films = contentCollection.find({type: { "$exists": True }})
+    films = contentCollection.find({"provider": { "$in": ["FREEVIEW"]} ,type: { "$exists": True }})
     films_array = []
     for film in films:
         film_reduced = {}

@@ -45,3 +45,5 @@ def calculate_24_format(time):
             time_hour = time_hour + 12
         return str(time_hour) + '.' + time_minute
 
+def split_string_by_comma(my_string):
+    return [x.strip() for x in my_string.split(',')]
