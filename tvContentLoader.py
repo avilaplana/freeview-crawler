@@ -257,13 +257,13 @@ def fix_date_in_dat(content_in_channel_provider):
 
 from datetime import datetime
 
-# day = datetime.now().day
-# month = datetime.now().month
-# year = datetime.now().year
+day = datetime.now().day
+month = datetime.now().month
+year = datetime.now().year
 
-month = 1
-year = 2015
-day = 31
+# month = 1
+# year = 2015
+# day = 31
 # myDAys = [1,2,3,4,5,6,7,8,9,10]
 # for day in myDAys:
 tags = loadHtmlTags(year, month, day, '12am', 'All')
