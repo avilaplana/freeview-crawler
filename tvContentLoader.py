@@ -285,15 +285,15 @@ for tag_url in tags:
                     all_channels_provider[channel] = []
                 all_channels_provider[channel].extend(partial_content[channel])
 
-        # for channel in all_channels_provider:
-        #     channel_already_crawled.add(channel)
-        #     content_in_channel_provider = []
-        #     [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
-        #      x not in content_in_channel_provider]
-        #
-        #     fix_date_in_dat(content_in_channel_provider)
-        #     for content in content_in_channel_provider:
-        #         contentCollection.insert(content)
+        for channel in all_channels_provider:
+            channel_already_crawled.add(channel)
+            content_in_channel_provider = []
+            [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
+             x not in content_in_channel_provider]
+
+            fix_date_in_dat(content_in_channel_provider)
+            for content in content_in_channel_provider:
+                contentCollection.insert(content)
 
 
 
