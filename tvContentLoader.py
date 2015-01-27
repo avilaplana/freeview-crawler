@@ -137,7 +137,7 @@ def series(description_html, serie_title, tv_content_series):
         description = description_html_parts[1]
         a = re.findall('\. Starring.*', description)
         if len(a) == 0:
-            tv_content_series['episode']['plotEpisode'] = description
+            tv_content_series['episode']['episodePlot'] = description
         else:
             content_details(description, tv_content_series, 'series')
 
@@ -285,15 +285,15 @@ for tag_url in tags:
                     all_channels_provider[channel] = []
                 all_channels_provider[channel].extend(partial_content[channel])
 
-        for channel in all_channels_provider:
-            channel_already_crawled.add(channel)
-            content_in_channel_provider = []
-            [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
-             x not in content_in_channel_provider]
-
-            fix_date_in_dat(content_in_channel_provider)
-            for content in content_in_channel_provider:
-                contentCollection.insert(content)
+        # for channel in all_channels_provider:
+        #     channel_already_crawled.add(channel)
+        #     content_in_channel_provider = []
+        #     [content_in_channel_provider.append(x) for x in all_channels_provider[channel] if
+        #      x not in content_in_channel_provider]
+        #
+        #     fix_date_in_dat(content_in_channel_provider)
+        #     for content in content_in_channel_provider:
+        #         contentCollection.insert(content)
 
 
 
