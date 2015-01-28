@@ -5,21 +5,18 @@ client = MongoClient('localhost', 27017)
 db = client['freeview']
 contentCollection = db['tvContent']
 
-def _find_all(type, title):
-    films = contentCollection.find({"provider": { "$in": ["FREEVIEW"]} ,type: { "$exists": True }})
-    films_array = []
-    for film in films:
-        film_reduced = {}
-        film_reduced[title] = film[type][title]
-        film_reduced["_id"] = film["_id"]
-        films_array.append(film_reduced)
-    return films_array
+def _find_all(type):
+    co = contentCollection.find({"provider": { "$in": ["FREEVIEW"]} ,type: { "$exists": True }})
+    content = []
+    for c in co:
+        content.append(c)
+    return content
 
 def find_all_films():
-    return _find_all("film", "title")
+    return _find_all("film")
 
 def find_all_series():
-    return _find_all("series", "serieTitle")
+    return _find_all("series")
 
-def aggregate_extra_content(id, extra):
-    contentCollection.update({"_id":id},{"$set": {"extra": extra}}, multi = True)
+def aggregate_extra_content(aggregate):
+    contentCollection.update({'_id':aggregate['_id']}, {"$set": aggregate}, upsert=False)

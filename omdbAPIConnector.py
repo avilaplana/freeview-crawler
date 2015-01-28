@@ -13,6 +13,3 @@ def getDetails(title):
 
 
 
-
-
-

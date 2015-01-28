@@ -2,7 +2,7 @@
 *.class
 target
 logs
-
+*.pyc
 */*dependency-reduced-pom.xml
 
 *.jar
