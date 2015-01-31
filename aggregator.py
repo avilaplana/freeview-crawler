@@ -28,6 +28,9 @@ def transform_aggregate(content_type, aggreate_data):
         content_type['awards'] = aggreate_data['Awards']
     if 'Poster' in aggreate_data:
         content_type['poster'] = aggreate_data['Poster']
+    if 'imdbID' in aggreate_data:
+        content_type['imdbId'] = aggreate_data['imdbID']
+
 
     return content_type
 
