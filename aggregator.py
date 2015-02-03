@@ -39,7 +39,7 @@ def extract_tvcontent_array(tvcontents, type_content, key_title):
     for t in tvcontents:
      try:
         title = t[type_content][key_title]
-        aggregate_data = getDetails(title.strip())
+        aggregate_data = getDetails(title.strip(), type_content)
         if 'Error' in aggregate_data:
             print t[type_content] + " NOT FOUND"
             continue
