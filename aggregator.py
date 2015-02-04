@@ -5,35 +5,31 @@ from tvContentRepository import find_all_films, find_all_series, aggregate_extra
 from omdbAPIConnector import getDetails
 from parsingLibrary import split_string_by_comma
 
-def transform_aggregate(content_type, aggreate_data):
-    if 'Director' in aggreate_data:
-        content_type['director'] = split_string_by_comma(aggreate_data['Director'])
-    if 'Writer' in aggreate_data:
-        content_type['writer'] = split_string_by_comma(aggreate_data['Writer'])
-    if 'Actors' in aggreate_data:
-        content_type['actor'] = split_string_by_comma(aggreate_data['Actors'])
-    if 'Genre' in aggreate_data:
-        content_type['genre'] = split_string_by_comma(aggreate_data['Genre'])
-    if 'Plot' in aggreate_data:
-        content_type['plot'] = aggreate_data['Plot']
-    if 'Language' in aggreate_data:
-        content_type['language'] = aggreate_data['Language']
-    if 'Country' in aggreate_data:
-        content_type['country'] = aggreate_data['Country']
-    if 'imdbRating' in aggreate_data:
-        content_type['rating'] = aggreate_data['imdbRating']
-    if 'Year' in aggreate_data:
-        content_type['year'] = aggreate_data['Year']
-    if 'Awards' in aggreate_data:
-        content_type['awards'] = aggreate_data['Awards']
-    if 'Poster' in aggreate_data:
-        content_type['poster'] = aggreate_data['Poster']
-    if 'imdbID' in aggreate_data:
-        content_type['imdbId'] = aggreate_data['imdbID']
+def transform_property(aggregate_key, tv_content_key, aggregate_data, content_type):
+     if aggregate_key in aggregate_data:
+        if "N/A" not in aggregate_data[aggregate_key]:
+            content_type[tv_content_key] = aggregate_data[aggregate_key]
 
+def transform_array(aggregate_key, tv_content_key, aggregate_data, content_type):
+     if aggregate_key in aggregate_data:
+         if "N/A" not in aggregate_data[aggregate_key]:
+            content_type[tv_content_key] = split_string_by_comma(aggregate_data[aggregate_key])
+         else: content_type[tv_content_key]  = []
+     else: content_type[tv_content_key]  = []
+
+def transform_aggregate(content_type, aggreate_data):
+
+    aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actor','Genre' : 'genre'}
+    aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language', 'Country' : 'country', 'imdbRating' : 'rating',
+                             'Year' : 'year', 'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
+
+    for aggregate_key in aggregate_array_keys:
+        transform_array(aggregate_key, aggregate_array_keys[aggregate_key], aggreate_data, content_type)
+
+    for aggregate_key in aggregate_single_keys:
+        transform_property(aggregate_key, aggregate_single_keys[aggregate_key], aggreate_data, content_type)
 
     return content_type
-
 
 def extract_tvcontent_array(tvcontents, type_content, key_title):
     for t in tvcontents:
