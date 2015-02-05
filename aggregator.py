@@ -19,7 +19,7 @@ def transform_array(aggregate_key, tv_content_key, aggregate_data, content_type)
 
 def transform_aggregate(content_type, aggreate_data):
 
-    aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actor','Genre' : 'genre', 'Country' : 'country'}
+    aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actors','Genre' : 'genre', 'Country' : 'country'}
     aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language', 'imdbRating' : 'rating',
                              'Year' : 'year', 'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
 
