@@ -172,7 +172,6 @@ def content_details(description_html, tv_type_content, type = 'no_series'):
             if len(b) > 0:
                 plot = re.sub('\..*, starring.*', '', description_html).replace('<br>', '.').strip()
                 set_plot_in_content(tv_type_content, plot, type)
-                tv_type_content['category'] = re.match('\. (.*),', b[0].split(' starring ')[0]).group(1).upper()
                 ac = b[0].split(' starring ')[1]
                 if '.' in ac:
                     actors = re.match('(.*)\..*', ac).group(1)
