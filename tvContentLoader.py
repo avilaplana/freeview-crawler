@@ -201,7 +201,7 @@ def find_content_interval_by_provider(telegraph_url, is_after_noon):
             tv_content = {}
             tv_content["channel"] = channel_formatted
             parse_time(program, tv_content, is_after_noon)
-            title = parse_title(program)
+            title = parse_title(program).strip()
 
             parse_content(program, title, tv_content)
             if not channel_formatted in content_in_interval:
