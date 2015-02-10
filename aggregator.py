@@ -8,7 +8,14 @@ from parsingLibrary import split_string_by_comma
 def transform_property(aggregate_key, tv_content_key, aggregate_data, content_type):
      if aggregate_key in aggregate_data:
         if "N/A" not in aggregate_data[aggregate_key]:
-            content_type[tv_content_key] = aggregate_data[aggregate_key]
+            if aggregate_key == 'imdbRating':
+                try:
+                    content_type[tv_content_key] = float(aggregate_data[aggregate_key])
+                except:
+                    print 'Error parsing to float:' + aggregate_data[aggregate_key]
+
+            else:
+                content_type[tv_content_key] = aggregate_data[aggregate_key]
 
 def transform_array(aggregate_key, tv_content_key, aggregate_data, content_type):
      if aggregate_key in aggregate_data:
