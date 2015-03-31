@@ -5,17 +5,29 @@ from tvContentRepository import find_all_films, find_all_series, aggregate_extra
 from omdbAPIConnector import getDetails
 from parsingLibrary import split_string_by_comma
 
+# def transform_property(aggregate_key, tv_content_key, aggregate_data, content_type):
+#      if aggregate_key in aggregate_data:
+#         if "N/A" not in aggregate_data[aggregate_key]:
+#             if aggregate_key == 'imdbRating':
+#                 try:
+#                     content_type[tv_content_key] = float(aggregate_data[aggregate_key])
+#                 except:
+#                     print 'Error parsing to float:' + aggregate_data[aggregate_key]
+#
+#             else:
+#                 content_type[tv_content_key] = aggregate_data[aggregate_key]
+
 def transform_property(aggregate_key, tv_content_key, aggregate_data, content_type):
      if aggregate_key in aggregate_data:
         if "N/A" not in aggregate_data[aggregate_key]:
-            if aggregate_key == 'imdbRating':
-                try:
-                    content_type[tv_content_key] = float(aggregate_data[aggregate_key])
-                except:
-                    print 'Error parsing to float:' + aggregate_data[aggregate_key]
-
-            else:
-                content_type[tv_content_key] = aggregate_data[aggregate_key]
+            # if aggregate_key == 'imdbRating':
+            #     try:
+            #         content_type[tv_content_key] = float(aggregate_data[aggregate_key])
+            #     except:
+            #         print 'Error parsing to float:' + aggregate_data[aggregate_key]
+            #
+            # else:
+            content_type[tv_content_key] = aggregate_data[aggregate_key]
 
 def transform_array(aggregate_key, tv_content_key, aggregate_data, content_type):
      if aggregate_key in aggregate_data:
@@ -24,19 +36,40 @@ def transform_array(aggregate_key, tv_content_key, aggregate_data, content_type)
          else: content_type[tv_content_key]  = []
      else: content_type[tv_content_key]  = []
 
-def transform_aggregate(content_type, aggreate_data):
+# def transform_aggregate(content_type, aggreate_data):
+#
+#     aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actors','Genre' : 'genre', 'Country' : 'country'}
+#     aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language', 'imdbRating' : 'rating',
+#                              'Year' : 'year', 'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
+#
+#     for aggregate_key in aggregate_array_keys:
+#         transform_array(aggregate_key, aggregate_array_keys[aggregate_key], aggreate_data, content_type)
+#
+#     for aggregate_key in aggregate_single_keys:
+#         transform_property(aggregate_key, aggregate_single_keys[aggregate_key], aggreate_data, content_type)
+#
+#     return content_type
+
+def transform_aggregate(content, type_content, aggregate_data):
 
     aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actors','Genre' : 'genre', 'Country' : 'country'}
-    aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language', 'imdbRating' : 'rating',
-                             'Year' : 'year', 'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
+    # aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language', 'imdbRating' : 'rating',
+    #                          'Year' : 'year', 'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
+    aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language','Year' : 'year',
+                             'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
 
     for aggregate_key in aggregate_array_keys:
-        transform_array(aggregate_key, aggregate_array_keys[aggregate_key], aggreate_data, content_type)
+        transform_array(aggregate_key, aggregate_array_keys[aggregate_key], aggregate_data, content[type_content])
 
     for aggregate_key in aggregate_single_keys:
-        transform_property(aggregate_key, aggregate_single_keys[aggregate_key], aggreate_data, content_type)
+        transform_property(aggregate_key, aggregate_single_keys[aggregate_key], aggregate_data, content[type_content])
 
-    return content_type
+    if "N/A" not in aggregate_data['imdbRating']:
+        try:
+            content['rating'] = float(aggregate_data['imdbRating'])
+        except:
+            print 'Error parsing to float:' + aggregate_data['imdbRating']
+
 
 def extract_tvcontent_array(tvcontents, type_content, key_title):
     for t in tvcontents:
@@ -47,7 +80,8 @@ def extract_tvcontent_array(tvcontents, type_content, key_title):
             print t[type_content] + " NOT FOUND"
             continue
         else:
-            transform_aggregate(t[type_content], aggregate_data)
+            # transform_aggregate(t[type_content], aggregate_data)
+            transform_aggregate(t, type_content, aggregate_data)
      except:
           print title + " can not be processed"
 
