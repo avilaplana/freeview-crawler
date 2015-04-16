@@ -21,7 +21,7 @@ def transform_aggregate(content, type_content, aggregate_data):
 
     aggregate_array_keys = {'Director':'director','Writer' : 'writer','Actors' : 'actors','Genre' : 'genre', 'Country' : 'country'}
     aggregate_single_keys = {'Plot' : 'plot', 'Language' : 'language','Year' : 'year',
-                             'Awards' : 'awards', 'Poster' : 'poster', 'imdbID' : 'imdbId'}
+                             'Awards' : 'awards', 'Poster' : 'posterImdb', 'imdbID' : 'imdbId'}
 
     for aggregate_key in aggregate_array_keys:
         transform_array(aggregate_key, aggregate_array_keys[aggregate_key], aggregate_data, content[type_content])
@@ -34,7 +34,6 @@ def transform_aggregate(content, type_content, aggregate_data):
             content['rating'] = float(aggregate_data['imdbRating'])
         except:
             print 'Error parsing to float:' + aggregate_data['imdbRating']
-
 
 def extract_tvcontent_array(tvcontents, type_content, key_title):
     for t in tvcontents:
