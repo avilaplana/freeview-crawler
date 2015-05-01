@@ -4,8 +4,11 @@ import urllib2
 from bs4 import BeautifulSoup
 from parsingLibrary import loadHtmlTags, parseChannel, remove_duplicate_elements
 from pymongo import MongoClient
+from mongoConfiguration import load_mongo_configuration
 
-client = MongoClient('localhost', 27017)
+mongo_address, mongo_port = load_mongo_configuration()
+client = MongoClient(mongo_address, mongo_port)
+
 db = client['freeview']
 channelCollection = db['tvChannel']
 channelCollection.drop()

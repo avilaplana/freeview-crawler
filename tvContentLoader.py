@@ -6,8 +6,11 @@ from parsingLibrary import loadHtmlTags, parseChannel, calculate_24_format
 from datetime import timedelta
 from pymongo import MongoClient
 import pytz
+from mongoConfiguration import load_mongo_configuration
 
-client = MongoClient('localhost', 27017)
+mongo_address, mongo_port = load_mongo_configuration()
+client = MongoClient(mongo_address, mongo_port)
+
 db = client['freeview']
 contentCollection = db['tvContent']
 contentCollection.drop()
