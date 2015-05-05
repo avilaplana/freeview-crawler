@@ -1,0 +1,13 @@
+0 1 * * * root /root/crawler.sh > /var/log/cron.log
+#* * * * * /root/crawler.sh > /var/log/cron.log
+#0 1 * * * /root/crawler.sh > /var/log/cron.log
+
+
+
+
+
+
+
+
+
+

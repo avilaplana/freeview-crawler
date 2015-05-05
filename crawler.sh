@@ -1,3 +1,4 @@
+cd /root
 python tvChannelLoader.py
 python tvContentLoader.py
 python tvProvidersInContent.py
