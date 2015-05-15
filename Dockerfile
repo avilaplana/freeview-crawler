@@ -1,28 +1,28 @@
 FROM python:2.7-slim
 
-ADD *.py /root/
-ADD crawler.sh /root/crawler.sh
+ADD *.py /
 
-RUN apt-get update
-RUN apt-get install -y python-pip
-RUN apt-get install -y build-essential python-dev
-RUN pip install pymongo
-RUN pip install beautifulsoup4
-RUN pip install pytz
-RUN pip install numpy
+ADD *.sh /
 
+RUN apt-get update && apt-get install -y \
+	python-pip \
+	build-essential \ 
+	python-dev \
+	cron
 
-RUN apt-get install -y cron
+RUN pip install \
+	pymongo \
+	beautifulsoup4 \
+	pytz \
+	numpy
 
-# Add crontab file in the cron directory
-ADD crontab /etc/cron.d/hello-cron
- 
-# Give execution rights on the cron job
+RUN touch /etc/cron.d/hello-cron
+
 RUN chmod 0644 /etc/cron.d/hello-cron
  
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
  
 # Run the command on container startup
-CMD /root/crawler.sh && cron && tail -f /var/log/cron.log 
+CMD /run_cron.sh && cron -f && /crawler.sh 
 

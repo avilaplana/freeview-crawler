@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 
 import datetime
 from tvContentRepository import find_all_films, find_all_series, aggregate_extra_content

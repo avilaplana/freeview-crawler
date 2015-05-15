@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 from pymongo import MongoClient
 from mongoConfiguration import load_mongo_configuration
 

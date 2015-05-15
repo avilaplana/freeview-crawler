@@ -1,5 +1,4 @@
-cd /root
-python tvChannelLoader.py
-python tvContentLoader.py
-python tvProvidersInContent.py
-python aggregator.py
+python /tvChannelLoader.py
+python /tvContentLoader.py
+python /tvProvidersInContent.py
+python /aggregator.py
