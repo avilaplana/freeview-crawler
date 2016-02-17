@@ -46,7 +46,7 @@ def extract_tvcontent_array(tvcontents, type_content, key_title):
         else:
             transform_aggregate(t, type_content, aggregate_data)
      except:
-          print title + " can not be processed"
+          pass
 
 films = find_all_films()
 series = find_all_series()
